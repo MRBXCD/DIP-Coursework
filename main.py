@@ -1,5 +1,5 @@
 import argparse
-from dehaze import DehazeProcess
+from dehOpenCVaze import DehazeProcess
 
 
 def main():
