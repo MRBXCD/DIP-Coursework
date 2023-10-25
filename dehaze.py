@@ -5,7 +5,9 @@ import os
 from PIL import Image
 import matplotlib
 import tqdm
-#from pylab import *
+
+
+# from pylab import *
 
 
 def DarkChannel(img):
@@ -80,8 +82,7 @@ class DehazeProcess:
         self.image_R1 = cv2.imread(os.path.join(self.p.raw_pic_dir, 'R1.jpg'))
         # Check
 
-
-
+    def Histogram(self):
         H22_rgb = cv2.cvtColor(self.image_H22, cv2.COLOR_BGR2RGB)
         H22_gray = cv2.cvtColor(H22_rgb, cv2.COLOR_BGR2GRAY)
         H22_hist = cv2.calcHist(H22_gray, [0], None, [256], [0, 256])
@@ -254,7 +255,7 @@ class DehazeProcess:
 
     def Dehaze(self):
         self.Histogram()
-       # cv2.waitKey()
+        # cv2.waitKey()
         if self.p.median == "image":
             # Normalize the image
             img_processed_for_DarkChannel = self.BasicProcessing()
