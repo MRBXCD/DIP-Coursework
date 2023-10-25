@@ -196,7 +196,7 @@ class DehazeProcess:
 
         # Calculate "A"
         A = atmos_illum / top_pixels_num
-        return Acal
+        return A
 
     def TransmissionEstimate(self, A):
         # In this function, we calculate the transmission estimate "t"
