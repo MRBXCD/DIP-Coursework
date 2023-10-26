@@ -1,5 +1,5 @@
 import argparse
-from dehOpenCVaze import DehazeProcess
+from dehaze import DehazeProcess
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
     parser.add_argument("--raw_video_dir", type=str, default="./IEV2022", help="Path of raw video")
     parser.add_argument("--dehazed_pic_path", type=str, default="./output/pic", help="Path of output image")
     parser.add_argument("--dehazed_video_path", type=str, default="./output/video", help="Path of output video")
-    parser.add_argument("--median", type=str, default="image", help="Decision of processing the image or video")
+    parser.add_argument("--median", type=str, default="video", help="Decision of processing the image or video")
     parser.add_argument("--frame_shape", type=list, default=[288, 352], help="Shape of a frame in the video")
     parser.add_argument("--dir_to_save_histograms", type=str, default='./output/histograms', help="Path to save histogram")
     parameters = parser.parse_args()
