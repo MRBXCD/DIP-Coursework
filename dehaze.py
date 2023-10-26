@@ -4,8 +4,8 @@ import cv2
 import os
 from PIL import Image
 import matplotlib
-import tqdm
-
+from tqdm import tqdm
+import time
 
 # from pylab import *
 
@@ -281,27 +281,41 @@ class DehazeProcess:
             # Set parameters to load video
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             fps = int(self.raw_video.get(cv2.CAP_PROP_FPS))
-            print(fps)
+            frame_count = int(self.raw_video.get(cv2.CAP_PROP_FRAME_COUNT))
+
+            print(f'The fps of this video is {fps}, the total frame count is {frame_count}')
+
+            total_iterations = frame_count
+            current_iteration = 0
+
             out = cv2.VideoWriter(os.path.join(self.p.dehazed_video_path, self.p.file_name_video[:-4] + '_Result.mp4'),
                                   fourcc, fps, (self.frame_width, self.frame_height))
 
             # Start a while loop to process the video
-            while self.raw_video.isOpened():
-                ret, self.frame = self.raw_video.read()
-                if not ret:
-                    break
-                frame_processed_for_DarkChannel = self.BasicProcessing()
-                dark_channel_video = DarkChannel(frame_processed_for_DarkChannel)
-                A = self.AtmosphericIllumination(dark_channel_video)
-                transEst = self.TransmissionEstimate(A)
-                tranEst_refined = self.TransmissionEstimateRefine(transEst)
-                frame = self.BasicProcessing()
-                enhanced_frame = RecoverImage(frame, tranEst_refined, A)
-                result = (enhanced_frame * 255).astype('uint8')
-                out.write(result)
+            start_time = time.time()
+            with tqdm(total=total_iterations, desc="Processing", unit="frame") as pbar:
+                while self.raw_video.isOpened():
+                    ret, self.frame = self.raw_video.read()
+                    if not ret:
+                        break
+                    frame_processed_for_DarkChannel = self.BasicProcessing()
+                    dark_channel_video = DarkChannel(frame_processed_for_DarkChannel)
+                    A = self.AtmosphericIllumination(dark_channel_video)
+                    transEst = self.TransmissionEstimate(A)
+                    tranEst_refined = self.TransmissionEstimateRefine(transEst)
+                    frame = self.BasicProcessing()
+                    enhanced_frame = RecoverImage(frame, tranEst_refined, A)
+                    result = (enhanced_frame * 255).astype('uint8')
+                    out.write(result)
+                    pbar.update(1)
+                    current_iteration += 1
 
             # Release the video objects
             self.raw_video.release()
             out.release()
             cv2.destroyAllWindows()
+            end_time = time.time()
+            time_consume = end_time - start_time
+            avg_fps = frame_count/time_consume
+            print(f"The total time consume is {time_consume} seconds, the average fps is {avg_fps}")
             print("Done")
